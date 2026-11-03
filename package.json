@@ -1,0 +1,8 @@
+{
+  "name": "gst-cleankart-refactor-iterate",
+  "version": "1.0.0",
+  "description": "GoMyCode checkpoint - CleanKart: Refactor & Iterate an Online Shopping Cart",
+  "main": "tests.js",
+  "scripts": { "test": "node tests.js" },
+  "license": "MIT"
+}
