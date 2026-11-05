@@ -26,10 +26,15 @@ function calc(d) {
 }
 
 function rm(n) {
-  for (let i = 0; i < c.length; i++) {
+  // Fixed 2026-11-05: used to splice()+return on the FIRST match only, so a
+  // name added twice kept its second entry. Now removes every entry with
+  // that name, matching iteration-1's filter()-based removeItem (see
+  // SUMMARY.md). Mutates `c` in place (iterating backwards while splicing)
+  // instead of reassigning it, because `c` is exported by reference and a
+  // reassignment here would not be visible on the exported property.
+  for (let i = c.length - 1; i >= 0; i--) {
     if (c[i].n == n) {
       c.splice(i, 1);
-      return;
     }
   }
 }

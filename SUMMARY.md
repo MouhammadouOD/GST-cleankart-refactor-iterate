@@ -10,7 +10,9 @@ Changes applied:
 - **Remove duplication**: the bulk-discount tier logic (`>= 5` / `>= 3`) was written once as a `DISCOUNT_THRESHOLDS` table instead of nested if/else.
 - **Encapsulate state**: the global `c` array became `this.items` inside a `Cart` class — no more module-level mutable state.
 
-Result verified: `tests.js` checks iteration 0 and iteration 1 produce the exact same total for the same input (50 → 40 with a bulk discount on qty 5), so the refactor provably changed nothing about behavior, only structure.
+Result verified: `tests.js` checks iteration 0 and iteration 1 produce the exact same total for the same input (50 → 40 with a bulk discount on qty 5).
+
+**Correction (2026-11-05)**: that single scenario was not enough to call the refactor "provably" behavior-preserving. A real divergence had gone undetected: `rm()` (iteration 0) removed only the *first* matching item via `splice()` + early `return`, while `removeItem()` (iteration 1) used `filter()` and removed *every* matching item — invisible because every test so far only ever added one item per name. Fixed by changing `rm()` to remove all matches (mutating the exported array in place, since it's exported by reference), and added a differential test with a duplicated item name that fails under the old first-match-only behavior and passes under the corrected one. The "same total" claim above is now actually backed by a test that would catch this specific class of regression; it still isn't a full behavioral-equivalence proof (percent-discount removeItem interactions, 3-4 unit boundary tiers, and multi-item carts are still untested for 0↔1 equivalence).
 
 ## Iteration 1 → 2: introducing design patterns
 

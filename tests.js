@@ -10,7 +10,7 @@ const {
 const { Customer } = require('./iteration-2-patterns/observers/Customer');
 const { Cart: PatternedCart } = require('./iteration-2-patterns/Cart');
 
-const TOTAL_TESTS = 10;
+const TOTAL_TESTS = 11;
 let passed = 0;
 function test(name, fn) {
   fn();
@@ -40,6 +40,24 @@ console.log('Iteration 0 (messy) vs Iteration 1 (refactored) — same behavior, 
     assert.strictEqual(messyCart.c.length, 0);
 
     const refactored = new RefactoredCart();
+    refactored.addItem('Widget', 10, 1, 'misc');
+    refactored.removeItem('Widget');
+    assert.strictEqual(refactored.items.length, 0);
+  });
+
+  test('removeItem avec un nom dupliqué retire TOUTES les occurrences dans les deux versions', () => {
+    // Avant le 2026-11-05, la version messy ne retirait que la 1re occurrence
+    // (splice+return), la version refactorée les retirait toutes (filter) -
+    // divergence jamais détectée car l'ancien test n'utilisait qu'un seul
+    // article. Ce test échouerait avec l'ancien comportement messy.
+    messyCart.c.length = 0;
+    messyCart.a('Widget', 10, 1, 'misc');
+    messyCart.a('Widget', 10, 1, 'misc');
+    messyCart.rm('Widget');
+    assert.strictEqual(messyCart.c.length, 0);
+
+    const refactored = new RefactoredCart();
+    refactored.addItem('Widget', 10, 1, 'misc');
     refactored.addItem('Widget', 10, 1, 'misc');
     refactored.removeItem('Widget');
     assert.strictEqual(refactored.items.length, 0);
